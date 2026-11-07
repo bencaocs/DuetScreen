@@ -42,8 +42,8 @@ expressed, viable or functional.
 
 ![DuetScreen architecture](docs/fig1bc.png)
 
-**b**, The NT-V3 encoder: the convolutional tower and transformer backbone are frozen, the
-deconvolutional tower is adapted for the screening task. **c**, Dual-space model: the nucleotide
+**Top**, The NT-V3 encoder: the convolutional tower and transformer backbone are frozen, the
+deconvolutional tower is adapted for the screening task. **down**, Dual-space model: the nucleotide
 stream (adapted NT-V3, state-space and convolution branches, token fusion) and the protein stream
 (translation, frozen ESM2-35M, 16 segment summaries, segment self-attention, protein readout) are
 fused into a joint representation, followed by the classification head and the training-only
