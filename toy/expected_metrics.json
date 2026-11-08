@@ -1,8 +1,11 @@
 {
   "seed": 42,
   "epochs": 1,
-  "validation_accuracy": 0.8125,
-  "validation_combined_accuracy": 0.8125,
-  "validation_auroc": 0.5876,
-  "note": "one-epoch sanity check, not a performance benchmark"
+  "validation_accuracy": 0.2812,
+  "validation_combined_accuracy": 0.2484,
+  "validation_auroc": 0.6795,
+  "note": "Example seed-42 run. Validation accuracy and AUROC use original views. Step counts and scores can vary across GPU environments.",
+  "optimizer_steps": 7,
+  "training_batches": 8,
+  "amp_init_scale": 1
 }

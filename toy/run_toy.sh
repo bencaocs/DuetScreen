@@ -26,7 +26,7 @@ echo "== 1/2 one-epoch training"
   -e DUETSCREEN_PROTEIN_SEG_CACHE=/toy/cache/protein_seg_cache_toy.pkl \
   --entrypoint python "$IMAGE" -m duetscreen.train \
   --records /toy/cache/variants_data_toy.pkl --output-dir /toy/out/seed42_toy \
-  --ntv3-model /assets/NTv3_8M_pre --seed 42 --epochs 1 --patience 1 \
+  --ntv3-model /assets/NTv3_8M_pre --seed 42 --epochs 1 --patience 1 --amp-init-scale 1 \
   --batch-size 16 --max-seq-len 2048 --external-test test=/toy/data/test_toy.fasta
 
 echo "== 2/2 toy prediction"

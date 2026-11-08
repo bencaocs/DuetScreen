@@ -73,26 +73,28 @@ The FASTAs are a stratified random subset of the released mixed-pool train/val/t
 From the repository root, with `toy/data/` and `toy/cache/` in place:
 
 ```bash
-ASSETS=assets ./toy/run_toy.sh
+./toy/run_toy.sh
 ```
 
-On Windows use `.\toy\run_toy.ps1 -Assets assets`. If PowerShell reports that running scripts is
-disabled, start it with `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1 -Assets assets`.
+On Windows use `.\toy\run_toy.ps1`. If PowerShell reports that running scripts is
+disabled, start it with `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1`.
 
 The script runs one training epoch on the toy split and then predicts the toy test set. After the
 Docker image has been built, this takes about two minutes on one GPU.
 
-Expected sanity values (one epoch, seed 42):
+The toy script uses an initial AMP loss scale of 1 so that its short run can take optimizer steps.
+Rebuild the Docker image from the current checkout if you installed an earlier version. The log
+reports how many batches updated the weights. Reference values from one seed-42 run are:
 
 | Quantity | Value |
 |---|---:|
-| Validation accuracy | 0.8125 |
-| Validation combined accuracy | 0.8125 |
-| Validation AUROC | 0.5876 |
+| Optimizer updates | 7 of 8 batches |
+| Validation accuracy (original views) | 0.2812 |
+| Validation combined accuracy | 0.2484 |
+| Validation AUROC (original views) | 0.6795 |
 
-A one-epoch model is not a performance benchmark: the test predictions are expected to be close to
-all-positive or all-negative. The point is to verify that data loading, view construction, the
-protein cache, training, checkpoint writing and prediction all work end to end.
+Step counts and scores can vary across GPU environments. Check for at least one optimizer update
+and predictions for all 40 toy test records from the checkpoint saved by this run.
 
 ## Manual commands
 
@@ -103,7 +105,7 @@ docker run --rm --gpus all \
   -e DUETSCREEN_PROTEIN_SEG_CACHE=/toy/cache/protein_seg_cache_toy.pkl \
   --entrypoint python duetscreen-release:1.0 -m duetscreen.train \
   --records /toy/cache/variants_data_toy.pkl --output-dir /toy/out/seed42_toy \
-  --ntv3-model /assets/NTv3_8M_pre --seed 42 --epochs 1 --patience 1 \
+  --ntv3-model /assets/NTv3_8M_pre --seed 42 --epochs 1 --patience 1 --amp-init-scale 1 \
   --batch-size 16 --max-seq-len 2048 --external-test test=/toy/data/test_toy.fasta
 
 # prediction

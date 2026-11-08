@@ -138,6 +138,7 @@ class Config:
     num_epochs = 20  # Number of training epochs
     weight_decay = 1e-5  # Weight decay
     grad_clip = 1.0  # Gradient clipping
+    amp_init_scale = 65536.0  # PyTorch GradScaler default for full training
     
     # Learning rate scheduler
     scheduler_type = "onecycle"

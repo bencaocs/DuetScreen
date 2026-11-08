@@ -81,7 +81,7 @@ class NucleotideMambaTrainer:
         # Create output directory
         os.makedirs(config.output_dir, exist_ok=True)
         
-        print(f"🚀 Initializing fully trainable Nucleotide Transformer v3 + Mamba Trainer")
+        print(f"🚀 Initializing DuetScreen trainer")
         print(f"  Device: {self.device}")
         print(f"  Output directory: {config.output_dir}")
         print(f"  Batch size: {config.batch_size} ⚠️ (NTv3 requires large memory)")
@@ -169,8 +169,8 @@ class NucleotideMambaTrainer:
         return train_loader, val_loader
     
     def create_model(self):
-        """Create fully trainable Nucleotide Transformer v3 + Mamba model"""
-        print(f"\n🧠 Creating fully trainable Nucleotide Transformer v3 + Mamba model...")
+        """Create the DuetScreen model and report its parameter counts."""
+        print(f"\n🧠 Creating DuetScreen model...")
         
         # Get model parameters from config
         model_kwargs = {
@@ -211,10 +211,10 @@ class NucleotideMambaTrainer:
         model_summary = model.get_model_summary()
         print(f"✅ Model created successfully")
         print(f"  Total parameters: {model_summary['total_parameters']:,}")
-        print(f"  Trainable parameters: {model_summary['trainable_parameters']:,} ⚠️ (fully trainable)")
-        print(f"  NTv3 parameters: {model_summary.get('ntv3_parameters', 0):,}")
-        print(f"  NTv3 trainable: {model_summary.get('ntv3_trainable', 0):,}")
-        print(f"  Mamba parameters: {model_summary.get('mamba_parameters', 0):,}")
+        print(f"  Trainable parameters: {model_summary['trainable_parameters']:,}")
+        print(f"  NTv3 parameters: {model_summary['encoder_parameters']:,}")
+        print(f"  NTv3 trainable: {model_summary['encoder_trainable']:,}")
+        print(f"  Downstream trainable: {model_summary['downstream_trainable_parameters']:,}")
         print(f"  Parameter size: {model_summary.get('parameter_mb', 0):.2f} MB")
         print(f"  Model dimension: {model_summary.get('d_model', 0)}")
         print(f"  Model architecture: {model_summary.get('model_architecture', '?')}")
@@ -238,7 +238,7 @@ class NucleotideMambaTrainer:
         return class_criterion, contrastive_criterion
     
     def create_optimizer(self, model):
-        """Create optimizer - NTv3 fully trainable, need to optimize all parameters"""
+        """Group the trainable NT-V3 and downstream parameters for AdamW."""
         # Separate NTv3 parameters from others, can set different learning rates
         ntv3_params = []
         other_params = []
@@ -275,8 +275,8 @@ class NucleotideMambaTrainer:
             })
         
         print(f"  Optimizer parameter groups:")
-        print(f"    NTv3 parameters: {len(ntv3_params)} groups, learning rate: {self.config.learning_rate * config.ntv3_learning_rate_multiplier}")
-        print(f"    Other parameters: {len(other_params)} groups, learning rate: {self.config.learning_rate}")
+        print(f"    NT-V3 optimizer group: {len(ntv3_params)} trainable tensors")
+        print(f"    Downstream optimizer group: {len(other_params)} trainable tensors")
         
         optimizer = optim.AdamW(
             optimizer_grouped_parameters,
@@ -394,8 +394,13 @@ class NucleotideMambaTrainer:
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
         
-        # Use tqdm to show progress
-        with tqdm(train_loader, desc=f"Epoch {epoch+1}/{self.config.num_epochs}") as pbar:
+        optimizer_steps = 0
+
+        def count_update(_optimizer, _args, _kwargs):
+            nonlocal optimizer_steps
+            optimizer_steps += 1
+
+        with optimizer.register_step_post_hook(count_update), tqdm(train_loader, desc=f"Epoch {epoch+1}/{self.config.num_epochs}") as pbar:
             for batch_idx, batch in enumerate(pbar):
                 # Move to device
                 batch = self._move_batch_to_device(batch)
@@ -616,6 +621,11 @@ class NucleotideMambaTrainer:
                 if batch_idx % 20 == 0 and torch.cuda.is_available():
                     torch.cuda.empty_cache()
             
+            print(f"Optimizer updates: {optimizer_steps}/{len(train_loader)} batches")
+            if optimizer_steps == 0:
+                raise RuntimeError("No optimizer update was applied in this epoch. "
+                                   "Check gradient finiteness and the AMP initial loss scale.")
+
             # Calculate epoch metrics
             epoch_samples = len(train_loader.dataset)
             avg_loss = epoch_loss / epoch_samples if epoch_samples > 0 else 0
@@ -639,6 +649,7 @@ class NucleotideMambaTrainer:
                             (semantic_metrics['acc'] + confusion_metrics['acc']) / 2 * variant_weight
             
             return {
+                'optimizer_steps': optimizer_steps,
                 'loss': avg_loss,
                 'class_loss': avg_class_loss,
                 'contrastive_loss': avg_contrastive_loss,
@@ -960,7 +971,7 @@ class NucleotideMambaTrainer:
 
     def train(self, variants_data):
         """Main training function"""
-        print(f"\n🎯 Starting fully trainable Nucleotide Transformer v3 training pipeline")
+        print(f"\n🎯 Starting DuetScreen training")
 
         # Seed here, not on config import: this also covers direct trainer.train()
         # calls and applies overrides before any loader or model is constructed.
@@ -985,7 +996,7 @@ class NucleotideMambaTrainer:
         optimizer, scheduler = self.create_optimizer(model)
         
         # 5. Mixed precision training
-        scaler = GradScaler(enabled=True)
+        scaler = GradScaler(enabled=True, init_scale=self.config.amp_init_scale)
         
         # 6. Training loop
         best_combined_acc = 0.0

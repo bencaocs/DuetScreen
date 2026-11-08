@@ -124,6 +124,8 @@ class AuditedTrainer(trainer_module.NucleotideMambaTrainer):
 
 def configure(args):
     destination = Path(args.output_dir).expanduser().resolve()
+    if not math.isfinite(args.amp_init_scale) or args.amp_init_scale <= 0:
+        raise ValueError("--amp-init-scale must be positive and finite")
     overrides = dict(
         block_type='v6:DuetScreen',
         pool_name='duetscreen',
@@ -143,6 +145,7 @@ def configure(args):
         max_seq_len=args.max_seq_len,
         max_seq_length=args.max_seq_len,
         num_epochs=args.epochs,
+        amp_init_scale=args.amp_init_scale,
         early_stop_patience=args.patience,
         freeze_transformer=True,
         n_layer=2,
@@ -273,6 +276,8 @@ def build_parser():
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--patience', type=int, default=5)
+    parser.add_argument('--amp-init-scale', type=float, default=config.amp_init_scale,
+                        help='initial AMP loss scale (the one-epoch toy demo uses 1)')
     parser.add_argument('--batch-size', type=int, default=16)
     parser.add_argument('--max-seq-len', type=int, default=2048)
     parser.add_argument('--external-test', action='append', default=[],

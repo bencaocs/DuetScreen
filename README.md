@@ -72,7 +72,7 @@ Both videos show commands running in Windows PowerShell with Docker. English cap
 
 | Recording | What to look for |
 |---|---|
-| [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) | Start with the three ZIP files, train for one epoch, then score all 40 toy test records with the checkpoint saved by that run. |
+| [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) | Start with the three ZIP files, train for one epoch, and score all 40 toy test records with the new checkpoint. The terminal shows the trainable NT-V3 parameter count and the number of optimizer updates. |
 | [Released checkpoint evaluation (MP4)](docs/videos/released-checkpoint-evaluation.mp4) | Run the released seed-42 checkpoint on the mixed-pool test set and both holdouts. At **2:50**, compare the new predictions with the seed-42 reference: AUROC and accuracy agree to four decimal places on all three sets. |
 
 ## Full training: download → train → metrics
@@ -206,7 +206,7 @@ and documentation are not overwritten:
 
 ```bash
 unzip -o DuetScreen_ToySubset.zip 'data/*' 'cache/*' -d toy/   # Linux / WSL2 / Git Bash
-ASSETS=assets ./toy/run_toy.sh
+./toy/run_toy.sh
 ```
 
 On Windows, extract to a temporary folder and copy only the two resource directories:
@@ -218,8 +218,8 @@ Remove-Item toy_tmp -Recurse -Force
 ```
 
 `toy/` already contains `README.md`, `run_toy.sh` and `run_toy.ps1`; the archive adds only `data/`
-and `cache/`. On Windows use `.\toy\run_toy.ps1 -Assets assets`; if PowerShell blocks scripts, run
-it with `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1 -Assets assets`.
+and `cache/`. On Windows use `.\toy\run_toy.ps1`; if PowerShell blocks scripts, run
+it with `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1`.
 
 ### Where the scripts live
 
@@ -506,15 +506,15 @@ versions of the README and scripts are preserved. [`toy/README.md`](toy/README.m
 commands for Linux/WSL and Windows. Then run:
 
 ```bash
-ASSETS=assets ./toy/run_toy.sh
+./toy/run_toy.sh
 ```
 
 The script trains for one epoch on the toy split and predicts the toy test set. After the Docker
 image has been built, this takes about two minutes on one GPU and exercises data loading, view
-construction, the protein cache, training, checkpoint writing and prediction end to end. Sanity
-values for seed 42 are validation accuracy 0.8125 and validation AUROC 0.5876. These are demo
-reference values, not paper results; the one-epoch test predictions are expected to be close to
-all-positive or all-negative.
+construction, the protein cache, training, checkpoint writing and prediction end to end. Look for
+the optimizer update count in the training log and 40 predictions in the test CSV. See the
+[toy guide](toy/README.md#run) for the AMP setting and example validation scores. If you have
+an earlier image, rebuild it from the current checkout before running this demo.
 
 ## Full retraining from the public dataset
 
