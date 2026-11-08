@@ -16,9 +16,9 @@ Only the **seed-42** checkpoint is public. Seeds 43–51 are not part of the pub
 weight record. The training-view cache is shared: it was generated once with seed 42
 and reused for every training seed.
 
-Extract `data/` and `cache/` into `toy/`. The [toy guide](toy/README.md) gives the platform-specific commands and the settings for both the expanded and original archives.
+Extract `data/` and `cache/` into `toy/`. The [toy guide](toy/README.md) gives the platform-specific commands and toy training settings.
 
-Exact sizes and SHA-256 values are in `assets_manifest.json`.
+`assets_manifest.json` lists checksums for the model weights and caches. For the toy dataset, Zenodo displays the ZIP size and checksum, and the manifest gives the SHA-256 for each extracted FASTA and cache file.
 
 ## Placement
 

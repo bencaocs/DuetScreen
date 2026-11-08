@@ -2,16 +2,16 @@
 
 ## Train and test on the toy data
 
-The [toy walkthrough](docs/videos/toy-training-and-test.mp4) starts with the source ZIP, expanded toy ZIP and pretrained encoder ZIP. It trains on 960 source records, selects a checkpoint on 240 validation records, and starts a fresh Docker container to score all 40 test records with that checkpoint.
+The [toy walkthrough](docs/videos/toy-training-and-test.mp4) starts with the source ZIP, toy data ZIP and pretrained encoder ZIP. It trains on 960 source records, selects a checkpoint on 240 validation records, and starts a fresh Docker container to score all 40 test records with that checkpoint.
 
 | Seed-42 run | Value |
 |---|---:|
 | Training epochs completed | 12 |
-| Epoch selected by validation combined accuracy | 7 |
-| Optimizer updates through the selected epoch | 462 |
+| Epoch selected by validation combined accuracy | 9 |
+| Optimizer updates through the selected epoch | 594 |
 | Optimizer updates across the recorded run | 792 |
-| Test AUROC | 0.6475 |
-| Test accuracy at 0.5 | 0.5500 |
+| Test AUROC | 0.6575 |
+| Test accuracy at 0.5 | 0.5750 |
 
 The model had 2,763,264 trainable NT-V3 decoder parameters and 2,987,761 trainable downstream parameters. Comparing the selected checkpoint with pretrained NT-V3 showed that 56 decoder tensors changed and all 91 frozen parameter tensors matched exactly. The [toy guide](toy/README.md#run) gives the commands and output paths.
 

@@ -8,15 +8,15 @@
   "epochs": 12,
   "max_epochs": 12,
   "patience": 5,
-  "best_epoch": 7,
+  "best_epoch": 9,
   "selection": "validation combined accuracy",
   "optimizer_steps": 792,
-  "optimizer_steps_to_best": 462,
+  "optimizer_steps_to_best": 594,
   "amp_init_scale": 1,
-  "validation_accuracy": 0.6875,
-  "validation_combined_accuracy": 0.6676,
-  "validation_auroc": 0.7781,
-  "test_auroc": 0.6475,
-  "test_accuracy": 0.55,
-  "note": "One seed-42 run of the expanded toy. Validation accuracy and AUROC use original views. Step counts and scores can vary across GPU environments."
+  "validation_accuracy": 0.6912,
+  "validation_combined_accuracy": 0.6744,
+  "validation_auroc": 0.7852,
+  "test_auroc": 0.6575,
+  "test_accuracy": 0.575,
+  "note": "One seed-42 run on the toy dataset. Validation accuracy and AUROC use original views. Step counts and scores can vary across GPU environments."
 }

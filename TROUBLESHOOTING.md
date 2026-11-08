@@ -52,8 +52,7 @@ is not a supported path.
 | symptom | fix |
 |---|---|
 | `toy/data` or `toy/cache` missing | Extract only those two directories from `DuetScreen_ToySubset.zip`; see `toy/README.md`. |
-| `toy/README.md` or scripts look older after unpacking | The v1 archive contains wrapper files. Restore the repository copies with `git checkout -- toy/README.md toy/run_toy.sh toy/run_toy.ps1`; do not extract those files from the archive. |
-| `run_toy.sh` fails in Git Bash on Windows | Use `run_toy.ps1` in a Windows terminal; the v1 archive's Bash script predates the path fix. |
+| `run_toy.sh` fails in Git Bash on Windows | Use `run_toy.ps1` in a Windows terminal. |
 
 ## Windows notes
 

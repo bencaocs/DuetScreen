@@ -496,9 +496,9 @@ condition. Rebuilding a cache with this module reproduces rows to fp16 precision
 
 ## Toy training and test
 
-The expanded [toy archive](https://doi.org/10.5281/zenodo.23538085) provides 960 training, 240 validation and 40 test records with both toy caches. Use the [toy guide](toy/README.md) to install the resources. Run `./toy/run_toy.sh` on Linux or `.\toy\run_toy.ps1` in Windows PowerShell.
+The [toy archive](https://doi.org/10.5281/zenodo.23538085) provides 960 training, 240 validation and 40 test records with both toy caches. Use the [toy guide](toy/README.md) to install the resources. Run `./toy/run_toy.sh` on Linux or `.\toy\run_toy.ps1` in Windows PowerShell.
 
-The runner trains for up to 12 epochs, selects a checkpoint by validation combined accuracy, and scores the fixed test set with that checkpoint. Results are written to `toy/out/expanded/`. The original 120-record archive also works with the same commands and runs its one-epoch check.
+The runner trains for up to 12 epochs, selects a checkpoint by validation combined accuracy, and scores the fixed test set with that checkpoint. Results are written to `toy/out/train960/`.
 
 ## Full retraining from the public dataset
 
@@ -852,7 +852,7 @@ record counts, accuracy values and checkpoint comparison.
 
 ## Citation and license
 
-If you use DuetScreen, please cite the manuscript (citation details to be added upon publication)
+If you use DuetScreen, please cite the manuscript
 and the Zenodo dataset record.
 
 Code is MIT (`LICENSE`). Author-created data, splits, caches and the seed-42 checkpoint are CC BY

@@ -50,16 +50,15 @@
     "toy/cache/"
    ],
    "role": "960/240/40 toy demo with packaged training views and protein features",
-   "size_bytes": 21835124,
-   "sha256": "9dac0bd6646fa997ee5b0202a5762e58e85c2f15d1eb833573efd7ed193f59a1",
    "extract": "Extract only data/ and cache/; do not overwrite repository toy/README.md, run_toy.sh, run_toy.ps1.",
-   "note": "The expanded archive includes a data card and SHA256SUMS.txt. Use the toy runners from the repository. The original 120-record version runs with the same entry points.",
-   "previous_version": {
-    "training_records": 120,
-    "size_bytes": 3547591,
-    "sha256": "d071d9dca4d39d53b2aa00d18441e5206c72f2dee1faf78e12a44f6ee5e5a202",
-    "md5_zenodo": "12d094499e38149e3f27596b778efcd1"
-   }
+   "checksums": {
+    "cache/protein_seg_cache_toy.pkl": "9f1210d6a5ef44825fd554ac468471e5c98d448626464316143e224d43b02644",
+    "cache/variants_data_toy.pkl": "12ed81f1ec175a402bcf0c62813e0a12b2380b2922cbaa91bb53a29284b11133",
+    "data/test_toy.fasta": "1d34931895df122c7c9982c286c3e9aaef69ac46db2f2af102dab12bdb042ecb",
+    "data/train_toy.fasta": "891063db3647ea66b4afd56370e5872657fa0b2e821e7fed73f200057e102d4c",
+    "data/val_toy.fasta": "4211776dd72d4f3884162f09a6f745cd2964bfe622a92d7aaf9bfb8b783730b6"
+   },
+   "note": "SHA-256 values refer to the extracted FASTA and cache files."
   }
  ],
  "dataset_record": {

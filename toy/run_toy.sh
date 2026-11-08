@@ -22,7 +22,7 @@ DOCKER="${DOCKER:-docker}"
 
 train_count=$(grep -c '^>' "$HERE/data/train_toy.fasta")
 case "$train_count" in
-  960) epochs=12; patience=5; out=/toy/out/expanded ;;
+  960) epochs=12; patience=5; out=/toy/out/train960 ;;
   120) epochs=1; patience=1; out=/toy/out ;;
   *) echo "Unsupported toy training set: $train_count records (expected 960 or 120)." >&2; exit 1 ;;
 esac

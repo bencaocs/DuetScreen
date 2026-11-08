@@ -21,7 +21,7 @@ if ($LASTEXITCODE -ne 0) { Fail "image $image not found; build it with: docker b
 
 $trainCount = (Select-String -LiteralPath (Join-Path $here 'data/train_toy.fasta') -Pattern '^>' | Measure-Object).Count
 switch ($trainCount) {
-    960 { $epochs = 12; $patience = 5; $out = 'out/expanded' }
+    960 { $epochs = 12; $patience = 5; $out = 'out/train960' }
     120 { $epochs = 1; $patience = 1; $out = 'out' }
     default { Fail "Unsupported toy training set: $trainCount records (expected 960 or 120)." }
 }

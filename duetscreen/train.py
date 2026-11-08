@@ -277,7 +277,7 @@ def build_parser():
     parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--patience', type=int, default=5)
     parser.add_argument('--amp-init-scale', type=float, default=config.amp_init_scale,
-                        help='initial AMP loss scale (the one-epoch toy demo uses 1)')
+                        help='initial AMP loss scale (the toy runner uses 1)')
     parser.add_argument('--batch-size', type=int, default=16)
     parser.add_argument('--max-seq-len', type=int, default=2048)
     parser.add_argument('--external-test', action='append', default=[],

@@ -44,7 +44,7 @@ toy/
 | Validation | 240 | 120 | 120 |
 | Test | 40 | 20 | 20 |
 
-The FASTAs are fixed samples from the corresponding mixed-pool splits. The 40 test records are identical to those in the original toy archive. The view cache contains 1,057 training segments and 274 validation segments. The packaged protein cache covers their original sequences and all 40 test records. Augmented views use the zero-input fallback for the protein stream. The archive includes a data card and per-file SHA-256 checksums.
+The FASTAs are fixed samples from the corresponding mixed-pool splits. The view cache contains 1,057 training segments and 274 validation segments. The packaged protein cache covers their original sequences and all 40 test records. Augmented views use the zero-input fallback for the protein stream. The archive includes a data card and per-file SHA-256 checksums.
 
 ## Run
 
@@ -60,17 +60,13 @@ On Linux or WSL2:
 ./toy/run_toy.sh
 ```
 
-If Windows PowerShell blocks scripts, use `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1`. The expanded run uses seed 42, batch size 16, up to 12 epochs and early-stopping patience 5. Validation combined accuracy selects the checkpoint. A second container loads it and predicts the test set at threshold 0.5.
+If Windows PowerShell blocks scripts, use `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1`. The toy run uses seed 42, batch size 16, up to 12 epochs and early-stopping patience 5. Validation combined accuracy selects the checkpoint. A second container loads it and predicts the test set at threshold 0.5.
 
 | Output | Path |
 |---|---|
-| Selected checkpoint | `toy/out/expanded/seed42_toy/best_nucleotide_v3_mamba_model.pth` |
-| Optimizer updates by epoch | `toy/out/expanded/seed42_toy/progress.jsonl` |
-| Test predictions | `toy/out/expanded/test_pred/predictions_threshold_0.5.csv` |
-| Test metrics | `toy/out/expanded/test_pred/detailed_results.json` |
+| Selected checkpoint | `toy/out/train960/seed42_toy/best_nucleotide_v3_mamba_model.pth` |
+| Optimizer updates by epoch | `toy/out/train960/seed42_toy/progress.jsonl` |
+| Test predictions | `toy/out/train960/test_pred/predictions_threshold_0.5.csv` |
+| Test metrics | `toy/out/train960/test_pred/detailed_results.json` |
 
 See [the verification record](../CHECKS.md) for the recorded run. Exact scores can vary by GPU environment. This 40-record test is a demonstration of the training and prediction workflow.
-
-### Original toy archive
-
-If you have an older archive with 120 training, 40 validation and 40 test records, the same runner recognizes it and runs the original one-epoch check under `toy/out/`.
