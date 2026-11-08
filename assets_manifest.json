@@ -55,7 +55,6 @@
    "extract": "Extract only data/ and cache/; do not overwrite repository toy/README.md, run_toy.sh, run_toy.ps1.",
    "note": "The expanded archive includes a data card and SHA256SUMS.txt. Use the toy runners from the repository. The original 120-record version runs with the same entry points.",
    "previous_version": {
-    "record": "https://doi.org/10.5281/zenodo.23538086",
     "training_records": 120,
     "size_bytes": 3547591,
     "sha256": "d071d9dca4d39d53b2aa00d18441e5206c72f2dee1faf78e12a44f6ee5e5a202",

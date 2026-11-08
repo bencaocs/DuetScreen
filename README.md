@@ -72,7 +72,7 @@ Both videos show commands running in Windows PowerShell with Docker. English cap
 
 | Recording | What to look for |
 |---|---|
-| [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) | Start with the three ZIP files, train on the expanded toy set, and score all 40 toy test records with the new checkpoint. The terminal shows the trainable NT-V3 parameter count and the number of optimizer updates. |
+| [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) | Set up DuetScreen from the code, toy data and pretrained NT-V3 archives. Train on 960 records, select a checkpoint using 240 validation records, and use that checkpoint to score all 40 test records. |
 | [Released checkpoint evaluation (MP4)](docs/videos/released-checkpoint-evaluation.mp4) | Run the released seed-42 checkpoint on the mixed-pool test set and both holdouts. The final table compares AUROC and accuracy on each set with the seed-42 reference. |
 
 ## Full training: download → train → metrics

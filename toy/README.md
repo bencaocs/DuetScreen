@@ -73,4 +73,4 @@ See [the verification record](../CHECKS.md) for the recorded run. Exact scores c
 
 ### Original toy archive
 
-The runner recognizes the [120/40/40 release](https://doi.org/10.5281/zenodo.23538086) and runs its original one-epoch check under `toy/out/`. Use the install commands above to keep the current scripts when extracting that release.
+If you have an older archive with 120 training, 40 validation and 40 test records, the same runner recognizes it and runs the original one-epoch check under `toy/out/`.
