@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-epoch toy training + prediction check.
+# Train and test on the packaged toy subset.
 #
 # Unpack DuetScreen_ToySubset.zip so that this folder contains data/ and cache/.
 # Run from the repository root:
@@ -20,13 +20,20 @@ DOCKER="${DOCKER:-docker}"
 [ -f "$HERE/cache/protein_seg_cache_toy.pkl" ] || { echo "missing toy protein cache"; exit 1; }
 "$DOCKER" image inspect "$IMAGE" >/dev/null 2>&1 || { echo "image $IMAGE not found; build it with: docker build -t $IMAGE ."; exit 1; }
 
-echo "== 1/2 one-epoch training"
+train_count=$(grep -c '^>' "$HERE/data/train_toy.fasta")
+case "$train_count" in
+  960) epochs=12; patience=5; out=/toy/out/expanded ;;
+  120) epochs=1; patience=1; out=/toy/out ;;
+  *) echo "Unsupported toy training set: $train_count records (expected 960 or 120)." >&2; exit 1 ;;
+esac
+
+echo "== 1/2 toy training: $train_count source records, up to $epochs epochs"
 "$DOCKER" run --rm --gpus all \
   -v "$HERE:/toy" -v "$ASSETS/NTv3_8M_pre:/assets/NTv3_8M_pre:ro" \
   -e DUETSCREEN_PROTEIN_SEG_CACHE=/toy/cache/protein_seg_cache_toy.pkl \
   --entrypoint python "$IMAGE" -m duetscreen.train \
-  --records /toy/cache/variants_data_toy.pkl --output-dir /toy/out/seed42_toy \
-  --ntv3-model /assets/NTv3_8M_pre --seed 42 --epochs 1 --patience 1 --amp-init-scale 1 \
+  --records /toy/cache/variants_data_toy.pkl --output-dir "$out/seed42_toy" \
+  --ntv3-model /assets/NTv3_8M_pre --seed 42 --epochs "$epochs" --patience "$patience" --amp-init-scale 1 \
   --batch-size 16 --max-seq-len 2048 --external-test test=/toy/data/test_toy.fasta
 
 echo "== 2/2 toy prediction"
@@ -35,11 +42,11 @@ echo "== 2/2 toy prediction"
   -e DUETSCREEN_PROTEIN_SEG_CACHE=/toy/cache/protein_seg_cache_toy.pkl \
   --entrypoint python "$IMAGE" -m duetscreen.predict \
   --fasta /toy/data/test_toy.fasta \
-  --model /toy/out/seed42_toy/best_nucleotide_v3_mamba_model.pth \
-  --ntv3-model /assets/NTv3_8M_pre --output-dir /toy/out/test_pred \
+  --model "$out/seed42_toy/best_nucleotide_v3_mamba_model.pth" \
+  --ntv3-model /assets/NTv3_8M_pre --output-dir "$out/test_pred" \
   --threshold 0.5 --batch-size 8
 
 echo
 echo "DONE"
-echo "checkpoint: $HERE/out/seed42_toy/best_nucleotide_v3_mamba_model.pth"
-echo "predictions: $HERE/out/test_pred/predictions_threshold_0.5.csv"
+echo "checkpoint: $HERE/${out#/toy/}/seed42_toy/best_nucleotide_v3_mamba_model.pth"
+echo "predictions: $HERE/${out#/toy/}/test_pred/predictions_threshold_0.5.csv"

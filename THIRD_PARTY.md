@@ -11,7 +11,7 @@ upstream model weights or third-party sequence data.
 | Benchmark splits | Zenodo record 23534656 / submission archive | CC BY 4.0 for author-created content |
 | Seed-42 checkpoint and NT-V3 encoder archive | Zenodo record 23535423 | CC BY 4.0 for the author-created checkpoint; the NT-V3 weights retain their upstream terms |
 | Shared training views and protein cache | Zenodo record 23537662 | CC BY 4.0 for author-created caches |
-| Toy subset | Zenodo record 23538086 | CC BY 4.0 for author-created content |
+| Toy subset | Zenodo collection DOI 10.5281/zenodo.23538085 | CC BY 4.0 for author-created content |
 
 The paper's other seed checkpoints (43–51) are **not** part of the public weight
 record.

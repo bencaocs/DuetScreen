@@ -29,7 +29,7 @@ expressed, viable or functional.
 - [Build the protein cache (ESM2-35M)](#build-the-protein-cache-esm2-35m)
 - [Environment](#environment)
 - [Quickstart](#quickstart)
-- [Toy validation (1 epoch)](#toy-validation-1-epoch)
+- [Toy training and test](#toy-training-and-test)
 - [Training from the public dataset](#full-retraining-from-the-public-dataset)
 - [Predict with the released checkpoint](#predict-with-the-released-checkpoint)
 - [Training](#train)
@@ -54,7 +54,7 @@ contrastive projection.
 
 | Goal | Entry | What it needs |
 |---|---|---|
-| See the workflow run quickly | **Quick toy demo** → [`toy/README.md`](toy/README.md), archive https://doi.org/10.5281/zenodo.23538086 | Docker image built; about two minutes after the environment is ready. Independent of the full dataset and full caches. Extract only `data/` and `cache/` from the v1 archive. Toy metrics are a pipeline demonstration, not paper results. |
+| See the workflow run quickly | **Quick toy demo** → [`toy/README.md`](toy/README.md), archive https://doi.org/10.5281/zenodo.23538085 | Train on 960 records, select a checkpoint on 240 validation records, and test on 40 records. Includes its own caches. Extract the archive's `data/` and `cache/` directories. |
 | Score sequences with the published model | **Predict with the released checkpoint** → [prediction guide](#predict-with-the-released-checkpoint), record https://doi.org/10.5281/zenodo.23535423 | Seed-42 checkpoint, `NTv3_8M_pre`, and a protein cache; **no training required**. |
 | Retrain with the released configuration | **Full training** → [training guide](#full-training-download--train--metrics), record https://doi.org/10.5281/zenodo.23537662 | Dataset, NT-V3 encoder, shared view cache and protein cache; GPU; hours. |
 
@@ -72,7 +72,7 @@ Both videos show commands running in Windows PowerShell with Docker. English cap
 
 | Recording | What to look for |
 |---|---|
-| [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) | Start with the three ZIP files, train for one epoch, and score all 40 toy test records with the new checkpoint. The terminal shows the trainable NT-V3 parameter count and the number of optimizer updates. |
+| [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) | Start with the three ZIP files, train on the expanded toy set, and score all 40 toy test records with the new checkpoint. The terminal shows the trainable NT-V3 parameter count and the number of optimizer updates. |
 | [Released checkpoint evaluation (MP4)](docs/videos/released-checkpoint-evaluation.mp4) | Run the released seed-42 checkpoint on the mixed-pool test set and both holdouts. The final table compares AUROC and accuracy on each set with the seed-42 reference. |
 
 ## Full training: download → train → metrics
@@ -122,7 +122,7 @@ cd DuetScreen
 | `variants_data_seed42.pkl` | https://doi.org/10.5281/zenodo.23537662 | rename to `runs/shared/variants_data.pkl` |
 | `protein_seg_cache_35m.7z.001–032` | https://doi.org/10.5281/zenodo.23537662 | extract → `assets/protein_seg_cache_35m.pkl` |
 | `best_nucleotide_v3_mamba_model.pth` (optional) | https://doi.org/10.5281/zenodo.23535423 | `assets/checkpoints/seed42/best_nucleotide_v3_mamba_model.pth` |
-| `DuetScreen_ToySubset.zip` (optional toy) | https://doi.org/10.5281/zenodo.23538086 | Extract only `data/` and `cache/` into `toy/`; follow [the toy installation guide](toy/README.md#install-the-resources). |
+| `DuetScreen_ToySubset.zip` (optional toy) | https://doi.org/10.5281/zenodo.23538085 | Extract only `data/` and `cache/` into `toy/`; follow [the toy installation guide](toy/README.md#install-the-resources). |
 
 ```bash
 mkdir -p assets data/mixed runs/shared assets/checkpoints/seed42
@@ -198,11 +198,9 @@ On Windows use `.\run_eval.ps1 -Model ... -Data ... -Cache ...`; if PowerShell b
 `-ExecutionPolicy Bypass` by starting it as
 `powershell -ExecutionPolicy Bypass -File .\run_eval.ps1 ...`.
 
-### 6. Optional: toy check (about two minutes)
+### 6. Optional: toy training and test
 
-The published toy archive is v1 and also contains older copies of `README.md`, `run_toy.sh`,
-`run_toy.ps1` and `expected_metrics.json`. Extract **only** its resources, so the repository scripts
-and documentation are not overwritten:
+Download the toy archive and extract its `data/` and `cache/` folders into `toy/`. Use the training and prediction scripts from this repository.
 
 ```bash
 unzip -o DuetScreen_ToySubset.zip 'data/*' 'cache/*' -d toy/   # Linux / WSL2 / Git Bash
@@ -229,7 +227,7 @@ it with `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1`.
 | `run_full_training.sh` | repository root | one-command training on `DATA=data/mixed` |
 | `run_eval.sh` | repository root | one-command prediction + ACC/F1/AUROC |
 | `run_eval.ps1` | repository root | Windows version of the evaluation wrapper |
-| `toy/run_toy.sh` | `toy/` | one-epoch toy training + prediction |
+| `toy/run_toy.sh` | `toy/` | toy training + prediction |
 | `docker/run_train.sh` | `docker/` | container wrapper for training |
 | `docker/run_predict.sh` | `docker/` | container wrapper for prediction |
 
@@ -240,7 +238,7 @@ it with `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1`.
 - `configs/duetscreen_release.json`: the configuration used for the reported runs.
 - `docker/`: container entry points for training, smoke training and prediction.
 - `tools/`: cache-coverage and result-verification utilities.
-- `toy/`: one-epoch toy workflow; `toy/data/` and `toy/cache/` are created after extracting the toy resources.
+- `toy/`: toy training and prediction workflow; `toy/data/` and `toy/cache/` are created after extracting the toy resources.
 - `Dockerfile`, `requirements.txt`: pinned environment.
 - `docs/`: setup and troubleshooting notes.
 
@@ -302,7 +300,7 @@ The Docker image `duetscreen-release:1.0` is built once from the repository root
 state is required. `runs/` is created by the training script and is not tracked by git.
 
 `toy/data/` and `toy/cache/` are not tracked in git. Extract only `data/` and `cache/` from
-`DuetScreen_ToySubset.zip` (https://doi.org/10.5281/zenodo.23538086) into `toy/`, following
+`DuetScreen_ToySubset.zip` (https://doi.org/10.5281/zenodo.23538085) into `toy/`, following
 [the toy installation guide](toy/README.md#install-the-resources). Keep the repository versions of
 the scripts and documentation. The toy outputs are written to `toy/out/`.
 
@@ -496,25 +494,11 @@ falls back to a zero protein vector, which is the trained "no protein channel"
 condition. Rebuilding a cache with this module reproduces rows to fp16 precision
 (max |diff| 5e-4).
 
-## Toy validation (1 epoch)
+## Toy training and test
 
-A fixed 120/40/40 subset with precomputed training views and protein cache is distributed
-separately (`DuetScreen_ToySubset.zip`, https://doi.org/10.5281/zenodo.23538086). The toy archive is
-self-contained: it does **not** require the full cache record. The published archive is v1 and also
-contains older wrapper files; extract only `data/` and `cache/` into `toy/` so that the repository
-versions of the README and scripts are preserved. [`toy/README.md`](toy/README.md) gives the exact
-commands for Linux/WSL and Windows. Then run:
+The expanded [toy archive](https://doi.org/10.5281/zenodo.23538085) provides 960 training, 240 validation and 40 test records with both toy caches. Use the [toy guide](toy/README.md) to install the resources. Run `./toy/run_toy.sh` on Linux or `.\toy\run_toy.ps1` in Windows PowerShell.
 
-```bash
-./toy/run_toy.sh
-```
-
-The script trains for one epoch on the toy split and predicts the toy test set. After the Docker
-image has been built, this takes about two minutes on one GPU and exercises data loading, view
-construction, the protein cache, training, checkpoint writing and prediction end to end. Look for
-the optimizer update count in the training log and 40 predictions in the test CSV. See the
-[toy guide](toy/README.md#run) for the AMP setting and example validation scores. If you have
-an earlier image, rebuild it from the current checkout before running this demo.
+The runner trains for up to 12 epochs, selects a checkpoint by validation combined accuracy, and scores the fixed test set with that checkpoint. Results are written to `toy/out/expanded/`. The original 120-record archive also works with the same commands and runs its one-epoch check.
 
 ## Full retraining from the public dataset
 
@@ -860,8 +844,7 @@ heads, batch 16, at most 20 epochs with patience 5, maximum 2,048 bp input.
 
 ## Verification scope
 
-In the recorded toy run, AdamW updated the weights on 7 of 8 batches and the resulting
-checkpoint scored all 40 toy test records. With the released seed-42 checkpoint,
+In the recorded toy run, the checkpoint selected on the validation set scored all 40 toy test records. With the released seed-42 checkpoint,
 AUROC was 0.9217 on the mixed test set, 0.8845 on the species holdout and 0.8815 on the
 protein-family holdout. AUROC and accuracy matched the seed-42 reference to four
 decimal places on all three sets. See [verification results](CHECKS.md) for the

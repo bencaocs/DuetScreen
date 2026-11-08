@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "updated": "2026-10-22",
+ "updated": "2026-11-08",
  "note": "Public release assets and local outputs are listed separately. Sizes and SHA-256 values were computed from the local copies used to prepare the release; Zenodo MD5 values are quoted where the upstream record publishes them.",
  "public_assets": [
   {
@@ -43,24 +43,24 @@
   },
   {
    "name": "Toy subset archive",
-   "record": "https://doi.org/10.5281/zenodo.23538086",
+   "record": "https://doi.org/10.5281/zenodo.23538085",
    "file": "DuetScreen_ToySubset.zip",
    "path_when_placed": [
     "toy/data/",
     "toy/cache/"
    ],
-   "role": "120/40/40 demo with its own view and protein caches",
-   "size_bytes": 3547591,
-   "sha256": "d071d9dca4d39d53b2aa00d18441e5206c72f2dee1faf78e12a44f6ee5e5a202",
-   "md5_zenodo": "12d094499e38149e3f27596b778efcd1",
+   "role": "960/240/40 toy demo with packaged training views and protein features",
+   "size_bytes": 21835124,
+   "sha256": "9dac0bd6646fa997ee5b0202a5762e58e85c2f15d1eb833573efd7ed193f59a1",
    "extract": "Extract only data/ and cache/; do not overwrite repository toy/README.md, run_toy.sh, run_toy.ps1.",
-   "archive_wrapper_files": [
-    "README.md",
-    "run_toy.sh",
-    "run_toy.ps1",
-    "expected_metrics.json"
-   ],
-   "note": "Published v1 archive. The wrapper files are older than the repository and are not used."
+   "note": "The expanded archive includes a data card and SHA256SUMS.txt. Use the toy runners from the repository. The original 120-record version runs with the same entry points.",
+   "previous_version": {
+    "record": "https://doi.org/10.5281/zenodo.23538086",
+    "training_records": 120,
+    "size_bytes": 3547591,
+    "sha256": "d071d9dca4d39d53b2aa00d18441e5206c72f2dee1faf78e12a44f6ee5e5a202",
+    "md5_zenodo": "12d094499e38149e3f27596b778efcd1"
+   }
   }
  ],
  "dataset_record": {

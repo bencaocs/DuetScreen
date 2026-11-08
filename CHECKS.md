@@ -2,16 +2,18 @@
 
 ## Train and test on the toy data
 
-The [toy walkthrough](docs/videos/toy-training-and-test.mp4) runs one epoch with seed 42,
-saves the checkpoint and uses it to score all 40 toy test records.
-AdamW updated the weights on 7 of 8 batches. Comparing the checkpoint with the
-pretrained NT-V3 weights showed changes in all 56 decoder tensors. The other
-91 NT-V3 parameter tensors matched their pretrained values exactly.
+The [toy walkthrough](docs/videos/toy-training-and-test.mp4) starts with the source ZIP, expanded toy ZIP and pretrained encoder ZIP. It trains on 960 source records, selects a checkpoint on 240 validation records, and starts a fresh Docker container to score all 40 test records with that checkpoint.
 
-The recorded model had 2,763,264 trainable NT-V3 decoder parameters and 2,987,761
-trainable downstream parameters (5,751,025 total trainable). On the toy test set
-the new checkpoint achieved AUROC 0.4850 and accuracy 0.4750. The [toy guide](toy/README.md#run)
-gives the commands and explains how to check the update count on your GPU.
+| Seed-42 run | Value |
+|---|---:|
+| Training epochs completed | 12 |
+| Epoch selected by validation combined accuracy | 7 |
+| Optimizer updates through the selected epoch | 462 |
+| Optimizer updates across the recorded run | 792 |
+| Test AUROC | 0.6475 |
+| Test accuracy at 0.5 | 0.5500 |
+
+The model had 2,763,264 trainable NT-V3 decoder parameters and 2,987,761 trainable downstream parameters. Comparing the selected checkpoint with pretrained NT-V3 showed that 56 decoder tensors changed and all 91 frozen parameter tensors matched exactly. The [toy guide](toy/README.md#run) gives the commands and output paths.
 
 ## Evaluate the released seed-42 checkpoint
 

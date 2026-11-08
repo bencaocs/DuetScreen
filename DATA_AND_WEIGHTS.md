@@ -10,15 +10,13 @@ Zenodo records; files created by a local run are listed separately at the end.
 | Benchmark splits | https://doi.org/10.5281/zenodo.23534656 | mixed, strict, holdout FASTA |
 | Seed-42 checkpoint + NT-V3 encoder | https://doi.org/10.5281/zenodo.23535423 | checkpoint 90.2 MB; encoder archive 28.6 MB |
 | Shared training views + protein cache | https://doi.org/10.5281/zenodo.23537662 | view cache 60.0 MB; protein cache 32 volumes, 979 MB extracted |
-| Toy subset | https://doi.org/10.5281/zenodo.23538086 | 120/40/40 demo with its own caches |
+| Toy subset | https://doi.org/10.5281/zenodo.23538085 | 960/240/40 demo with its own caches |
 
 Only the **seed-42** checkpoint is public. Seeds 43–51 are not part of the public
 weight record. The training-view cache is shared: it was generated once with seed 42
 and reused for every training seed.
 
-The toy archive is published as v1 and also contains older wrapper files. Extract only
-`data/` and `cache/` into `toy/`; keep the repository `toy/README.md`, `run_toy.sh` and
-`run_toy.ps1`. `toy/README.md` gives the exact platform-specific commands.
+Extract `data/` and `cache/` into `toy/`. The [toy guide](toy/README.md) gives the platform-specific commands and the settings for both the expanded and original archives.
 
 Exact sizes and SHA-256 values are in `assets_manifest.json`.
 

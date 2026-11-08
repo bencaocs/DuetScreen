@@ -1,4 +1,4 @@
-# One-epoch toy training + prediction check (Windows PowerShell 5.1+).
+# Train and test on the packaged toy subset (Windows PowerShell 5.1+).
 #
 # Unpack DuetScreen_ToySubset.zip so that this folder contains data\ and cache\.
 # Run from the repository root:
@@ -19,13 +19,20 @@ if (-not (Test-Path (Join-Path $here "cache\protein_seg_cache_toy.pkl"))) { Fail
 docker image inspect $image *> $null
 if ($LASTEXITCODE -ne 0) { Fail "image $image not found; build it with: docker build -t $image ." }
 
-Write-Host "`n== 1/2 one-epoch training"
+$trainCount = (Select-String -LiteralPath (Join-Path $here 'data/train_toy.fasta') -Pattern '^>' | Measure-Object).Count
+switch ($trainCount) {
+    960 { $epochs = 12; $patience = 5; $out = 'out/expanded' }
+    120 { $epochs = 1; $patience = 1; $out = 'out' }
+    default { Fail "Unsupported toy training set: $trainCount records (expected 960 or 120)." }
+}
+
+Write-Host "`n== 1/2 toy training: $trainCount source records, up to $epochs epochs"
 docker run --rm --gpus all `
   -v "$($here):/toy" -v "$($Assets)\NTv3_8M_pre:/assets/NTv3_8M_pre:ro" `
   -e DUETSCREEN_PROTEIN_SEG_CACHE=/toy/cache/protein_seg_cache_toy.pkl `
   --entrypoint python $image -m duetscreen.train `
-  --records /toy/cache/variants_data_toy.pkl --output-dir /toy/out/seed42_toy `
-  --ntv3-model /assets/NTv3_8M_pre --seed 42 --epochs 1 --patience 1 --amp-init-scale 1 `
+  --records /toy/cache/variants_data_toy.pkl --output-dir /toy/$out/seed42_toy `
+  --ntv3-model /assets/NTv3_8M_pre --seed 42 --epochs $epochs --patience $patience --amp-init-scale 1 `
   --batch-size 16 --max-seq-len 2048 --external-test test=/toy/data/test_toy.fasta
 if ($LASTEXITCODE -ne 0) { Fail "toy training failed" }
 
@@ -35,11 +42,11 @@ docker run --rm --gpus all `
   -e DUETSCREEN_PROTEIN_SEG_CACHE=/toy/cache/protein_seg_cache_toy.pkl `
   --entrypoint python $image -m duetscreen.predict `
   --fasta /toy/data/test_toy.fasta `
-  --model /toy/out/seed42_toy/best_nucleotide_v3_mamba_model.pth `
-  --ntv3-model /assets/NTv3_8M_pre --output-dir /toy/out/test_pred `
+  --model /toy/$out/seed42_toy/best_nucleotide_v3_mamba_model.pth `
+  --ntv3-model /assets/NTv3_8M_pre --output-dir /toy/$out/test_pred `
   --threshold 0.5 --batch-size 8
 if ($LASTEXITCODE -ne 0) { Fail "toy prediction failed" }
 
 Write-Host "`nDONE"
-Write-Host "checkpoint: $(Join-Path $here 'out\seed42_toy\best_nucleotide_v3_mamba_model.pth')"
-Write-Host "predictions: $(Join-Path $here 'out\test_pred\predictions_threshold_0.5.csv')"
+Write-Host "checkpoint: $(Join-Path $here "$out/seed42_toy/best_nucleotide_v3_mamba_model.pth")"
+Write-Host "predictions: $(Join-Path $here "$out/test_pred/predictions_threshold_0.5.csv")"

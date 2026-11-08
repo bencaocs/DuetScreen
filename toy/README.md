@@ -1,16 +1,6 @@
-# Toy subset: one-epoch training and prediction check
+# Toy training and test
 
-A small, fixed subset for reviewers who want to see the full pipeline run in a few minutes instead
-of training on the complete benchmark.
-
-The resource archive is `DuetScreen_ToySubset.zip`
-(https://doi.org/10.5281/zenodo.23538086). It is self-contained: the full training caches
-(https://doi.org/10.5281/zenodo.23537662) are **not** needed for the toy workflow.
-
-The published archive is **v1**. Besides `data/` and `cache/`, it contains the v1 copies of
-`README.md`, `run_toy.sh`, `run_toy.ps1` and `expected_metrics.json`. Those wrapper files are older
-than this repository, and extracting the whole archive over `toy/` would overwrite them. **Extract
-only `data/` and `cache/`**; keep the repository versions of the scripts and this README.
+Train DuetScreen in Docker and use the checkpoint selected during this run to score 40 labelled records. The [toy archive](https://doi.org/10.5281/zenodo.23538085) includes the toy training views and protein features. Download the [NT-V3 pretrained encoder](https://doi.org/10.5281/zenodo.23535423) separately and extract it under `assets/NTv3_8M_pre/` so that `model.safetensors` is directly in that folder. Build the image from the current repository with `docker build -t duetscreen-release:1.0 .`. The runner uses a CUDA-enabled GPU.
 
 ## Install the resources
 
@@ -30,7 +20,7 @@ Copy-Item -Path toy_tmp\data,toy_tmp\cache -Destination toy\ -Recurse -Force
 Remove-Item toy_tmp -Recurse -Force
 ```
 
-The result must be exactly:
+Check that the following files are present:
 
 ```
 toy/
@@ -46,78 +36,41 @@ toy/
     protein_seg_cache_toy.pkl
 ```
 
-## Contents used from the archive
+## Data
 
-| Path | Contents |
-|---|---|
-| `data/train_toy.fasta` | 120 records (60 positive / 60 negative) |
-| `data/val_toy.fasta` | 40 records (20 / 20) |
-| `data/test_toy.fasta` | 40 records (20 / 20) |
-| `cache/variants_data_toy.pkl` | supervised views built from the toy train/val split (183 segments, 366 views) |
-| `cache/protein_seg_cache_toy.pkl` | ESM2-35M 16-segment cache for all 223 toy sequences |
+| Split | Source records | Positive | Negative |
+|---|---:|---:|---:|
+| Train | 960 | 480 | 480 |
+| Validation | 240 | 120 | 120 |
+| Test | 40 | 20 | 20 |
 
-The v1 wrapper files in the archive (`README.md`, `run_toy.sh`, `run_toy.ps1`, `expected_metrics.json`)
-are not used. They are listed for transparency only; the repository copies are authoritative.
-
-The FASTAs are a stratified random subset of the released mixed-pool train/val/test splits
-(sampling seed 42). Labels use the `pos_` / `neg_` prefixes.
-
-## Requirements
-
-- Docker image built from the repository: `docker build -t duetscreen-release:1.0 .`
-- NT-V3 encoder folder: `assets/NTv3_8M_pre` (default layout: inside the repository)
-- One GPU with at least 8 GB of memory
+The FASTAs are fixed samples from the corresponding mixed-pool splits. The 40 test records are identical to those in the original toy archive. The view cache contains 1,057 training segments and 274 validation segments. The packaged protein cache covers their original sequences and all 40 test records. Augmented views use the zero-input fallback for the protein stream. The archive includes a data card and per-file SHA-256 checksums.
 
 ## Run
 
-From the repository root, with `toy/data/` and `toy/cache/` in place:
+From the repository root, run one command:
+
+```powershell
+.\toy\run_toy.ps1
+```
+
+On Linux or WSL2:
 
 ```bash
 ./toy/run_toy.sh
 ```
 
-On Windows use `.\toy\run_toy.ps1`. If PowerShell reports that running scripts is
-disabled, start it with `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1`.
+If Windows PowerShell blocks scripts, use `powershell -ExecutionPolicy Bypass -File .\toy\run_toy.ps1`. The expanded run uses seed 42, batch size 16, up to 12 epochs and early-stopping patience 5. Validation combined accuracy selects the checkpoint. A second container loads it and predicts the test set at threshold 0.5.
 
-The script runs one training epoch on the toy split and then predicts the toy test set. After the
-Docker image has been built, this takes about two minutes on one GPU.
+| Output | Path |
+|---|---|
+| Selected checkpoint | `toy/out/expanded/seed42_toy/best_nucleotide_v3_mamba_model.pth` |
+| Optimizer updates by epoch | `toy/out/expanded/seed42_toy/progress.jsonl` |
+| Test predictions | `toy/out/expanded/test_pred/predictions_threshold_0.5.csv` |
+| Test metrics | `toy/out/expanded/test_pred/detailed_results.json` |
 
-The toy script uses an initial AMP loss scale of 1 so that its short run can take optimizer steps.
-Rebuild the Docker image from the current checkout if you installed an earlier version. The log
-reports how many batches updated the weights. Reference values from one seed-42 run are:
+See [the verification record](../CHECKS.md) for the recorded run. Exact scores can vary by GPU environment. This 40-record test is a demonstration of the training and prediction workflow.
 
-| Quantity | Value |
-|---|---:|
-| Optimizer updates | 7 of 8 batches |
-| Validation accuracy (original views) | 0.2812 |
-| Validation combined accuracy | 0.2484 |
-| Validation AUROC (original views) | 0.6795 |
+### Original toy archive
 
-Step counts and scores can vary across GPU environments. Check for at least one optimizer update
-and predictions for all 40 toy test records from the checkpoint saved by this run.
-
-## Manual commands
-
-```bash
-# training
-docker run --rm --gpus all \
-  -v "$PWD/toy:/toy" -v "$PWD/assets/NTv3_8M_pre:/assets/NTv3_8M_pre:ro" \
-  -e DUETSCREEN_PROTEIN_SEG_CACHE=/toy/cache/protein_seg_cache_toy.pkl \
-  --entrypoint python duetscreen-release:1.0 -m duetscreen.train \
-  --records /toy/cache/variants_data_toy.pkl --output-dir /toy/out/seed42_toy \
-  --ntv3-model /assets/NTv3_8M_pre --seed 42 --epochs 1 --patience 1 --amp-init-scale 1 \
-  --batch-size 16 --max-seq-len 2048 --external-test test=/toy/data/test_toy.fasta
-
-# prediction
-docker run --rm --gpus all \
-  -v "$PWD/toy:/toy" -v "$PWD/assets/NTv3_8M_pre:/assets/NTv3_8M_pre:ro" \
-  -e DUETSCREEN_PROTEIN_SEG_CACHE=/toy/cache/protein_seg_cache_toy.pkl \
-  --entrypoint python duetscreen-release:1.0 -m duetscreen.predict \
-  --fasta /toy/data/test_toy.fasta \
-  --model /toy/out/seed42_toy/best_nucleotide_v3_mamba_model.pth \
-  --ntv3-model /assets/NTv3_8M_pre --output-dir /toy/out/test_pred \
-  --threshold 0.5 --batch-size 8
-```
-
-Do not pair `protein_seg_cache_toy.pkl` with a different view cache: cache keys are exact DNA
-sequences, and views generated with another seed will miss keys.
+The runner recognizes the [120/40/40 release](https://doi.org/10.5281/zenodo.23538086) and runs its original one-epoch check under `toy/out/`. Use the install commands above to keep the current scripts when extracting that release.

@@ -1,11 +1,22 @@
 {
   "seed": 42,
-  "epochs": 1,
-  "validation_accuracy": 0.2812,
-  "validation_combined_accuracy": 0.2484,
-  "validation_auroc": 0.6795,
-  "note": "Example seed-42 run. Validation accuracy and AUROC use original views. Step counts and scores can vary across GPU environments.",
-  "optimizer_steps": 7,
-  "training_batches": 8,
-  "amp_init_scale": 1
+  "split_sources": {
+    "train": 960,
+    "validation": 240,
+    "test": 40
+  },
+  "epochs": 12,
+  "max_epochs": 12,
+  "patience": 5,
+  "best_epoch": 7,
+  "selection": "validation combined accuracy",
+  "optimizer_steps": 792,
+  "optimizer_steps_to_best": 462,
+  "amp_init_scale": 1,
+  "validation_accuracy": 0.6875,
+  "validation_combined_accuracy": 0.6676,
+  "validation_auroc": 0.7781,
+  "test_auroc": 0.6475,
+  "test_accuracy": 0.55,
+  "note": "One seed-42 run of the expanded toy. Validation accuracy and AUROC use original views. Step counts and scores can vary across GPU environments."
 }
