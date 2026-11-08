@@ -14,7 +14,7 @@ only `data/` and `cache/`**; keep the repository versions of the scripts and thi
 
 ## Install the resources
 
-Run from the repository root.
+Use the current [DuetScreen repository](https://github.com/bencaocs/DuetScreen) for the code and run the commands below from its root.
 
 Linux / WSL2 / Git Bash:
 

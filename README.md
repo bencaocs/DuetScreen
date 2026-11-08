@@ -109,7 +109,7 @@ alternative for users who prefer to run the `python -m duetscreen.*` commands di
 ### 1. Clone
 
 ```bash
-git clone https://github.com/qiaosuheng/DuetScreen.git
+git clone https://github.com/bencaocs/DuetScreen.git
 cd DuetScreen
 ```
 
