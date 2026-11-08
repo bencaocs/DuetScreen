@@ -18,16 +18,14 @@ class Config:
     output_dir = "results_nmi_mixed_seed42"  # Output directory (one per seed/pool)
     
     # ========== Data Configuration ==========
-    max_seq_length = 2048  # Maximum DNA sequence length ⚠️ Changed to 2048
+    max_seq_length = 2048  # Maximum DNA sequence length
     min_segment_len = 30  # Minimum fragment length
     positive_fasta = "train_data/VFDB_setB_nt.fasta"  # Positive samples file
     negative_fasta = "train_data/non_pathogenic_regions.fasta"  # Negative samples file
-    # 0 = preserve the delivered class composition (decision for the NMI
-    # revision; the release is pre-balanced at both record and segment level).
-    # Set 3.0 to restore the legacy negative-downsampling behavior.
+    # Zero preserves all records in the supplied splits.
     downsample_ratio = 0.0
 
-    # ========== Prepared-Split Mode (nmi_dataset_release) ==========
+    # ========== Prepared splits ==========
     # True: read the delivered train/val FASTA pair directly (one file per
     # split, labels encoded in the record ID prefix pos_/neg_) and skip the
     # internal 8:1:1 re-split. Validation runs on the delivered val records;
@@ -46,32 +44,13 @@ class Config:
     # One shared variant cache per pool; membership is fixed by the delivered
     # files, so the cache is seed-independent and generated at most once.
     training_seeds = [42, 43, 44, 45, 46]
-    # Symmetric augmentation: negatives also receive semantic/confusion
-    # variants (label 0) to break the "synthetic flavor => positive" shortcut
-    #   mixed     = legacy positive-only variants (before arm)
-    #   mixed_sym = symmetric augmentation (after arm)
+    # Generate labelled views for both positive and negative records.
     symmetric_variants = True
-    # Pure-task protocol (arm C, control specification) — completed 2026-09-20:
-    # test 0.846±0.017 (≈B+), proving the dual-path stack is innocent and the
-    # auxiliary objective package caused O's −0.09. Disabled for the
-    # reweighted arm below.
+    # Use only the classification loss on original samples when enabled.
     pure_task_mode = False
-    # Reweighted objective (arm "rw", internal control specification): the
-    # original-sample task keeps 1 - aux_budget of the loss; the auxiliary
-    # terms (view BCE / contrastive / path supervision) share aux_budget
-    # proportionally to their legacy weights, no 1.4 renormalization.
-    # Framing: variants are demoted to "biologically-motivated perturbation
-    # samples"; augmentation must not dominate the primary task loss.
+    # Assign 1 - aux_budget to the original samples and distribute the rest across auxiliary losses.
     objective_reweight = True
     aux_budget = 0.1
-    # pool_name convention (architecture-overhaul, 2026-09-18; arm C added
-    # 2026-09-19 after the matched-control plan):
-    #   <dataset-pool>_<protocol>_<arch-tag>
-    #   mixed_sym      = mixed pool + symmetric augmentation + Mamba core (previous arm)
-    #   mixed_sym_tr   = mixed pool + symmetric augmentation + Transformer core
-    #   mixed_sym_conv = mixed pool + symmetric augmentation + dilated-Conv core
-    #   mixed_pure     = mixed pool + pure-task protocol + Mamba core (arm C)
-    #   mixed_sym_rw   = mixed pool + symmetric augmentation + reweighted 0.9/0.1 objective (this arm)
     pool_name = "mixed_sym_rw"   # naming component for runs/ and evaluations/
     results_root = "runs"          # <results_root>/<pool_name>/cache + seed<N>/
     evaluations_root = "evaluations"  # <evaluations_root>/<pool_name>/seed<N>/<set>/
@@ -86,7 +65,6 @@ class Config:
     # It controls Python/NumPy and PyTorch CPU/CUDA training randomness.
     seed = 42
     # Keep this fixed across runs so the same ordered input yields the same subset.
-    # Training/validation splitting also remains fixed at 42 in realtime_trainer.py.
     sampling_seed = 42
     # Evaluation inputs must remain disjoint from all records used for fitting
     # and model selection. Missing files or overlapping content stop training.
@@ -112,14 +90,12 @@ class Config:
     dropout_rate = 0.2  # Dropout rate
     
     # Mamba block configuration
-    # block_type naming (architecture-overhaul, 2026-09-18):
+    # Nucleotide block options:
     #   dual_path             = shared Mamba2 core (original)
     #   dual_path_transformer = shared TransformerEncoderLayer core (no mamba_ssm needed)
     #   dual_path_conv        = shared dilated-Conv (TCN) core (no mamba_ssm needed)
-    #   future variants       = dual_path_<core>, e.g. dual_path_lstm
     block_type = "dual_path"
-    # Classification head: "mlp" (legacy ours) or "linear" (baseline-matched
-    # head-swap control; it can also be set without touching this file)
+    # Options: a multilayer perceptron or a single linear classifier.
     classifier_head = "mlp"
     use_path_selection = True  # Whether to use path selection network
     path_selection_weight = 0.1  # Path selection loss weight

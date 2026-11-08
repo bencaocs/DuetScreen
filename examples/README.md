@@ -6,4 +6,4 @@ four background) in the header convention used throughout the paper:
 
 Expected behaviour with the released seed-42 checkpoint and the matching protein
 cache: eight scores in `[0,1]`, positives typically above negatives. Exact values
-depend on the checkpoint and cache; see CHECKS.md for the recorded smoke output.
+depend on the checkpoint and cache; see the [eight reference scores](../tools/expected_smoke.json).

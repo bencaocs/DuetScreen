@@ -667,7 +667,7 @@ class DualReadoutPool(nn.Module):
 class BasicTransformerBlock(nn.Module):
     """Vanilla stack block with a pre-norm TransformerEncoderLayer core.
 
-    Core-swap control on the simplified stack (control specification priority 2):
+    Alternative sequence-mixing core for the nucleotide stack:
     same LN -> core -> Dropout shape as BasicMambaBlock; only the
     sequence-mixing core differs.
     """
@@ -815,9 +815,9 @@ class DualPathMambaBlock(nn.Module):
         attn_num_heads: int = 4,
         use_flash_attention: bool = True,
         use_adaptive_scales: bool = True,  # New: whether to use adaptive scales
-        # T1 control (control specification): zero every INTERNAL dropout site
+        # Optionally disable dropout inside the block
         # (attention internals, gate network, fusion MLP) while keeping the
-        # block-output Dropout at its historical 0.1.
+        # block-output Dropout at 0.1.
         zero_internal_dropout: bool = False
     ):
         super().__init__()
@@ -999,7 +999,7 @@ class DualPathMambaBlock(nn.Module):
 
 
 class DualPathTransformerBlock(nn.Module):
-    """Dual-path block with a shared Transformer core (architecture-overhaul variant).
+    """Dual-path block with a shared Transformer core.
 
     Interface-compatible with DualPathMambaBlock: identical path enhancement
     (semantic path + adversarial path), gating, path-selection losses and
@@ -1153,7 +1153,7 @@ class DualPathTransformerBlock(nn.Module):
 class _ConvCore(nn.Module):
     """Stacked dilated 1-D convolutions with entry norm and residual.
 
-    Sequence-mixing core for the architecture-overhaul variants: a small TCN
+    Sequence-mixing core for convolutional variants: a small TCN
     style block (Conv k=5 dil=1 -> GELU -> Conv k=5 dil=2, wide bottleneck,
     pre-norm, residual). Same [B, L, D] -> [B, L, D] contract as the Mamba2 /
     TransformerEncoderLayer cores.
@@ -1185,7 +1185,7 @@ class _ConvCore(nn.Module):
 
 
 class DualPathConvBlock(nn.Module):
-    """Dual-path block with a shared dilated-Conv core (architecture-overhaul variant).
+    """Dual-path block with a shared dilated-Conv core.
 
     Interface-compatible with DualPathMambaBlock / DualPathTransformerBlock:
     identical path enhancement, gating, path-selection losses and output
@@ -1334,7 +1334,7 @@ class DualPathConvBlock(nn.Module):
 
 
 class NucleotideMambaModel(nn.Module):
-    """Fully trainable NTv3 enhanced Mamba sequence model without residual connections"""
+    """Nucleotide sequence model with an NT-V3 encoder and configurable downstream blocks."""
     
     def __init__(
         self,
@@ -1358,18 +1358,16 @@ class NucleotideMambaModel(nn.Module):
         use_flash_attention: bool = True,
         use_adaptive_scales: bool = True,  # New: whether to use adaptive scales
         # Transformer configuration - Note: We do NOT freeze here!
-        freeze_transformer: bool = True,  # Changed to False for full trainability
+        freeze_transformer: bool = True,  # Freeze the encoder unless adaptation is enabled
         use_caching: bool = False,  # Force disable caching to ensure feature dimension consistency
         trust_remote_code: bool = True,  # v3 requires this
         # Architecture configuration
         enable_tf32: bool = True,
         compile_model: bool = False,
         device: Optional[str] = None,
-        # Classification head: "mlp" (legacy ours: Linear-GELU-Dropout-Linear
-        # after output_norm) or "linear" (single Linear, matched to the
-        # baseline head; head-swap arm 2026-09-20)
+        # Apply an MLP or a single linear classifier after output normalization.
         classifier_head: str = "mlp",
-        # T1 control flag: zero internal dropouts of dual-path Mamba blocks
+        # Disable dropout inside the dual-path Mamba blocks.
         zero_internal_dropout: bool = False,
         # v3 network-level parallel readout; ignored by historical types.
         readout_pool: str = "attention",
@@ -1436,7 +1434,7 @@ class NucleotideMambaModel(nn.Module):
         print(f"  Embedding dimension: {embedding_dim}")
         print(f"  Model dimension: {d_model}")
         print(f"  Number of layers: {n_layer}")
-        print(f"  Block type: {block_type}")
+        print(f"  Nucleotide block: {block_type}")
         print(f"  Classifier head: {classifier_head}")
         print(f"  Maximum sequence length: {max_seq_len}")
         print(f"  Adaptive scales: {self.use_adaptive_scales}")
@@ -1483,7 +1481,7 @@ class NucleotideMambaModel(nn.Module):
                     zero_internal_dropout=zero_internal_dropout
                 )
             elif block_type == "dual_path_transformer":
-                # Architecture-overhaul variant: shared Transformer core
+                # Shared Transformer core
                 block = DualPathTransformerBlock(
                     d_model=d_model,
                     layer_idx=i,
@@ -1495,7 +1493,7 @@ class NucleotideMambaModel(nn.Module):
                     use_adaptive_scales=use_adaptive_scales
                 )
             elif block_type == "dual_path_conv":
-                # Architecture-overhaul variant: shared dilated-Conv core
+                # Shared dilated-Conv core
                 block = DualPathConvBlock(
                     d_model=d_model,
                     layer_idx=i,
@@ -1537,10 +1535,10 @@ class NucleotideMambaModel(nn.Module):
                     use_adaptive_scales=use_adaptive_scales
                 )
             elif block_type == "basic_transformer":
-                # Vanilla-stack core-swap control (control specification)
+                # Sequence-mixing core for the single stack
                 block = BasicTransformerBlock(d_model=d_model, nhead=attn_num_heads)
             elif block_type == "basic_conv":
-                # Vanilla-stack core-swap control (control specification)
+                # Sequence-mixing core for the single stack
                 block = BasicConvBlock(d_model=d_model)
             else:  # "basic"
                 block = BasicMambaBlock(d_model=d_model)
@@ -1572,7 +1570,7 @@ class NucleotideMambaModel(nn.Module):
         # 5. Output normalization
         self.output_norm = nn.LayerNorm(d_model)
         
-        # 6. Classification head ("mlp" = legacy ours; "linear" = baseline-matched)
+        # 6. Classification head
         if classifier_head == "linear":
             self.classifier = nn.Sequential(
                 nn.Linear(d_model, num_classes)
@@ -2118,7 +2116,7 @@ def create_nucleotide_mamba_model(
     use_flash_attention: bool = True,
     use_adaptive_scales: bool = True,  # New parameter
     # Transformer configuration
-    freeze_transformer: bool = True,  # Fully trainable
+    freeze_transformer: bool = True,
     use_caching: bool = True,
     trust_remote_code: bool = True,
     # GPU optimization parameters

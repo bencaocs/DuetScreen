@@ -1,9 +1,6 @@
 """Downstream network for the released dual-space model.
 
-Production dependencies: torch >= 2.1 and the project's real mamba_ssm.Mamba2.
-No vision weights, custom attention kernels, new loss, or fake Mamba fallback.
-The official factories lock the agreed 256-d / 2-Mamba / 2048-token profile.
-Algorithmic sources and deviations are cited in the paper.
+The released configuration uses width 256, two Mamba blocks and a 2,048-token context.
 """
 from __future__ import annotations
 
@@ -446,11 +443,9 @@ class DuetScreenNetwork(base.DualStackNetwork):
         super().__init__(**cfg)
         self.model_id = model_id
         self.block_type = 'v6:' + model_id + ('' if kernel == 'mamba' else ':' + kernel) + ('+nogrn' if config.get('no_grn') else '')
-        # The old readout is removed, so it cannot bloat the count or optimizer.
+        # The fusion layer supplies the sequence readout.
         self.sequence_pooler = nn.Identity()
-        # Initialize the common fusion FIRST, so different branch parameter
-        # counts do not change its seed. F0 and T10 additionally share exact
-        # initial Conv weights; only T10 then draws coupling parameters.
+        # Initialize fusion before the branches so its weights are independent of branch size.
         self.fusion = TokenFusion(self.d_model)
         self.fusion.apply(_init_new_module)
         # Protein channel (released model): frozen ESM2-35M embeddings of 16
@@ -523,7 +518,7 @@ class DuetScreenNetwork(base.DualStackNetwork):
 
     def forward_sequence(self, sequences, variant_type=None, training_mode=True):
         if isinstance(self.token_encoder, base.EncoderStub):
-            raise RuntimeError('Attach the REAL project encoder before forward_sequence; the collaboration stub is not training data')
+            raise RuntimeError('Attach a nucleotide encoder before calling forward_sequence.')
         if training_mode and variant_type == 'original':
             sequences = maybe_augment(sequences)
         f = self.token_encoder(sequences, training_mode=training_mode)

@@ -73,7 +73,7 @@ Both videos show commands running in Windows PowerShell with Docker. English cap
 | Recording | What to look for |
 |---|---|
 | [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) | Start with the three ZIP files, train for one epoch, and score all 40 toy test records with the new checkpoint. The terminal shows the trainable NT-V3 parameter count and the number of optimizer updates. |
-| [Released checkpoint evaluation (MP4)](docs/videos/released-checkpoint-evaluation.mp4) | Run the released seed-42 checkpoint on the mixed-pool test set and both holdouts. At **2:50**, compare the new predictions with the seed-42 reference: AUROC and accuracy agree to four decimal places on all three sets. |
+| [Released checkpoint evaluation (MP4)](docs/videos/released-checkpoint-evaluation.mp4) | Run the released seed-42 checkpoint on the mixed-pool test set and both holdouts. The final table compares AUROC and accuracy on each set with the seed-42 reference. |
 
 ## Full training: download → train → metrics
 
@@ -860,11 +860,12 @@ heads, batch 16, at most 20 epochs with patience 5, maximum 2,048 bp input.
 
 ## Verification scope
 
-`CHECKS.md` separates documentation-level checks, historical environment/execution
-records (17 October 2026) and what has not been re-run. The current documentation
-revision did not repeat full 20-epoch training or paper-table reproduction; the
-historical records are quoted as evidence for the date and build they describe, not
-as a fresh validation of the current commit.
+In the recorded toy run, AdamW updated the weights on 7 of 8 batches and the resulting
+checkpoint scored all 40 toy test records. With the released seed-42 checkpoint,
+AUROC was 0.9217 on the mixed test set, 0.8845 on the species holdout and 0.8815 on the
+protein-family holdout. AUROC and accuracy matched the seed-42 reference to four
+decimal places on all three sets. See [verification results](CHECKS.md) for the
+record counts, accuracy values and checkpoint comparison.
 
 ## Citation and license
 

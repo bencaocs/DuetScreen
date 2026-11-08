@@ -47,7 +47,7 @@ class RealtimeSequenceDataset(Dataset):
         self.segments = segments
         self.max_seq_len = max_seq_len
         self.use_cache = use_cache
-        # Arm C (pure-task protocol): never expose variant views, even when the
+        # In pure-task mode, return only original samples, even when the
         # underlying records carry them.
         self.pure_task = pure_task
         

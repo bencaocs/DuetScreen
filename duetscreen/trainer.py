@@ -31,8 +31,8 @@ DATA_SPLIT_SEED = 42
 def build_loss_weights(config):
     """Objective weights for the classification-family losses.
 
-    Legacy ours: 0.8·BCE(orig) + 0.1·BCE(T1) + 0.1·BCE(T2) + 0.3·contrastive
-    + 0.1·path, all divided by 1.4. Reweighted arms (control): the
+    Default weighting: 0.8·BCE(orig) + 0.1·BCE(T1) + 0.1·BCE(T2) + 0.3·contrastive
+    + 0.1·path, all divided by 1.4. With reweighting, the
     original-sample task keeps ``1 - aux_budget``; the auxiliary terms share
     ``aux_budget`` proportionally to their legacy weights, with no
     renormalization, so the primary task dominates the gradient.
@@ -46,12 +46,12 @@ def build_loss_weights(config):
         weights = {k: budget * v / total_aux for k, v in legacy.items() if k != "orig"}
         weights["orig"] = 1.0 - budget
         weights["norm"] = 1.0
-    # Ladder rung 5 (control): dual-path WITHOUT the contrastive term —
+    # Disabling the contrastive loss preserves the other coefficients:
     # keep view BCE + path supervision + augmentation, zero only contrast.
     if getattr(config, "objective_no_contrastive", False):
         weights["contrast"] = 0.0
-    # D_L control (control specification): dual-path with path KL + entropy
-    # switched off; remaining terms keep their coefficients and the total
+    # Disable the path KL and entropy terms when requested. The
+    # remaining terms keep their coefficients and the total
     # keeps its historical normalization (no rescaling).
     if getattr(config, "objective_no_path", False):
         weights["path"] = 0.0
@@ -64,7 +64,7 @@ class NucleotideMambaTrainer:
     def __init__(self, config):
         self.config = config
         self.device = torch.device(config.device)
-        # Arm C (pure-task protocol): plain original-sample BCE only.
+        # Use only the original-sample BCE in pure-task mode.
         self.pure_mode = bool(getattr(config, "pure_task_mode", False))
         if self.pure_mode:
             print("🧪 Pure-task protocol: original samples only, plain BCE "
@@ -951,7 +951,7 @@ class NucleotideMambaTrainer:
                 'pure_task_mode': self.pure_mode,
                 # Rebuild-critical: the embedding truncates inputs to
                 # max_seq_len at tokenization, so eval must reuse the
-                # training value (2026-09-20 eval-pipeline fix).
+                # training value.
                 'max_seq_len': getattr(self.config, 'max_seq_len', 2048),
                 'dropout_rate': getattr(self.config, 'dropout_rate', 0.2),
             },

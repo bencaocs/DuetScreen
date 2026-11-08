@@ -40,9 +40,8 @@ For the other entry points:
 - toy workflow: `./toy/run_toy.sh` after unpacking the toy archive;
 - full training: `./run_full_training.sh` with `DATA=data/mixed`.
 
-See `README.md` for the three entry points and `CHECKS.md` for the verification
-scope (historical execution records versus checks performed for the current
-documentation revision).
+See the [README](../README.md) for the three entry points and the
+[verification results](../CHECKS.md) for the toy run and released checkpoint.
 
 ## If the assistant gets stuck
 

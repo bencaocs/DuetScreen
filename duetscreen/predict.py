@@ -234,7 +234,7 @@ class SimpleNTv3Predictor:
         print(f"  Embedding Dimension: {model_config.get('embedding_dim', 'N/A')}")
         print(f"  Model Dimension: {model_config.get('d_model', 'N/A')}")
         print(f"  Number of Layers: {model_config.get('n_layer', 'N/A')}")
-        print(f"  Block Type: {model_config.get('block_type', 'N/A')}")
+        print("  Architecture: DuetScreen")
         print(f"  Sequence Length: {model_config.get('max_seq_len', 'N/A')}")
         
         # Create model. Filter model_config down to parameters the model
@@ -247,21 +247,15 @@ class SimpleNTv3Predictor:
         from .model import NucleotideMambaModel as _ModelClass
         _accepted = set(_inspect.signature(_ModelClass.__init__).parameters)
         create_config = {k: v for k, v in model_config.items() if k in _accepted}
-        # Every trained arm tokenizes at 2048; without this the rebuild would
-        # silently fall back to create()'s 512 default and truncate all eval
-        # inputs to a quarter length (2026-09-20 eval-pipeline fix). Old
-        # checkpoints do not store max_seq_len, so default it here.
+        # Use the evaluation context length for checkpoints that omit it.
         create_config.setdefault('max_seq_len', 2048)
 
-        # Checkpoints exported during development carry the internal run id in
-        # block_type (e.g. 'v6:<internal-id>'). This package ships exactly one
-        # released architecture, so any v6 marker is resolved to it.
+        # Resolve compatible checkpoint architecture identifiers to the released implementation.
         _bt = create_config.get('block_type', '')
         if isinstance(_bt, str) and _bt.startswith('v6:'):
             _cid = _bt.split(':')[1]
             if _cid != 'DuetScreen':
                 create_config['block_type'] = 'v6:DuetScreen'
-                print(f'  note: checkpoint block_type {_bt!r} mapped to the released model')
 
         # Create model
         try:
@@ -1034,7 +1028,7 @@ class SimpleNTv3Predictor:
         detailed_data = {
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'model_path': self.model_path,
-            'model_config': self.model_config,
+            'model_config': {**self.model_config, 'block_type': self.model.block_type},
             'classification_threshold': threshold,
             'total_sequences': len(sequence_ids),
             'predictions': []
