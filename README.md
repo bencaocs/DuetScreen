@@ -72,8 +72,8 @@ Both videos show commands running in Windows PowerShell with Docker. English cap
 
 | Recording | What to look for |
 |---|---|
-| [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) · [Subtitles (SRT)](docs/videos/toy-training-and-test.en.srt) | Start with the three ZIP files, train for one epoch, then score all 40 toy test records with the checkpoint saved by that run. |
-| [Released checkpoint evaluation (MP4)](docs/videos/released-checkpoint-evaluation.mp4) · [Subtitles (SRT)](docs/videos/released-checkpoint-evaluation.en.srt) | Run the released seed-42 checkpoint on the mixed-pool test set and both holdouts. At **2:50**, compare the new predictions with the seed-42 reference: AUROC and accuracy agree to four decimal places on all three sets. |
+| [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) | Start with the three ZIP files, train for one epoch, then score all 40 toy test records with the checkpoint saved by that run. |
+| [Released checkpoint evaluation (MP4)](docs/videos/released-checkpoint-evaluation.mp4) | Run the released seed-42 checkpoint on the mixed-pool test set and both holdouts. At **2:50**, compare the new predictions with the seed-42 reference: AUROC and accuracy agree to four decimal places on all three sets. |
 
 ## Full training: download → train → metrics
 
