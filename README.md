@@ -19,6 +19,7 @@ expressed, viable or functional.
 
 - [Architecture](#architecture)
 - [Start here: three entry points](#start-here-three-entry-points)
+  - [Recorded walkthroughs](#recorded-walkthroughs)
 - [Full training: download → train → metrics](#full-training-download--train--metrics)
 - [What is included](#what-is-included)
 - [Project layout after setup](#project-layout-after-setup)
@@ -64,6 +65,15 @@ the repository root unless a section says otherwise.
 with WSL2 GPU support (Docker Desktop). macOS CUDA is not supported, and CPU-only
 training is not a validated path. `bash` blocks target Linux, WSL2 or Git Bash;
 `powershell` blocks target the `.ps1` wrappers in a Windows terminal.
+
+### Recorded walkthroughs
+
+Both videos show commands running in Windows PowerShell with Docker and include English subtitles.
+
+| Recording | What to look for |
+|---|---|
+| [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) · [Subtitles (SRT)](docs/videos/toy-training-and-test.en.srt) | Start with the three ZIP files, train for one epoch, then score all 40 toy test records with the checkpoint saved by that run. |
+| [Released checkpoint evaluation (MP4)](docs/videos/released-checkpoint-evaluation.mp4) · [Subtitles (SRT)](docs/videos/released-checkpoint-evaluation.en.srt) | Run the released seed-42 checkpoint on the mixed-pool test set and both holdouts. At **2:50**, compare the new predictions with the seed-42 reference: AUROC and accuracy agree to four decimal places on all three sets. |
 
 ## Full training: download → train → metrics
 

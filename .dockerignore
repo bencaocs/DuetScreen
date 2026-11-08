@@ -5,3 +5,4 @@ runs
 out
 *.pth
 *.pt
+docs/videos/
