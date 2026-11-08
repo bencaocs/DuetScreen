@@ -68,7 +68,7 @@ training is not a validated path. `bash` blocks target Linux, WSL2 or Git Bash;
 
 ### Recorded walkthroughs
 
-Both videos show commands running in Windows PowerShell with Docker and include English subtitles.
+Both videos show commands running in Windows PowerShell with Docker. English captions appear directly below the terminal throughout playback.
 
 | Recording | What to look for |
 |---|---|
