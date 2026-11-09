@@ -70,8 +70,7 @@ training is not a validated path. `bash` blocks target Linux, WSL2 or Git Bash;
 
 Both videos show commands running in Windows PowerShell with Docker. English captions appear directly below the terminal throughout playback.
 
-
-https://github.com/bencaocs/DuetScreen/blob/main/docs/videos/toy-training-and-test.mp4
+<video src="https://github.com/user-attachments/assets/6b4080f3-f92f-4205-a858-72682a5a1ca2" controls width="100%"></video>
 
 | Recording | What to look for |
 |---|---|
