@@ -70,7 +70,7 @@ training is not a validated path. `bash` blocks target Linux, WSL2 or Git Bash;
 
 Both videos show commands running in Windows PowerShell with Docker. English captions appear directly below the terminal throughout playback.
 
-<video src="https://github.com/user-attachments/assets/6b4080f3-f92f-4205-a858-72682a5a1ca2" controls width="100%"></video>
+<video src="https://github.com/user-attachments/assets/6b4080f3-f92f-4205-a858-72682a5a1ca2" controls width="150%"></video>
 
 | Recording | What to look for |
 |---|---|
