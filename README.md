@@ -70,6 +70,9 @@ training is not a validated path. `bash` blocks target Linux, WSL2 or Git Bash;
 
 Both videos show commands running in Windows PowerShell with Docker. English captions appear directly below the terminal throughout playback.
 
+
+<video src="https://github.com/bencaocs/DuetScreen/blob/main/docs/videos/toy-training-and-test.mp4" width="600" controls autoplay loop muted></video>
+
 | Recording | What to look for |
 |---|---|
 | [Toy training and test (MP4)](docs/videos/toy-training-and-test.mp4) | Set up DuetScreen from the code, toy data and pretrained NT-V3 archives. Train on 960 records, select a checkpoint using 240 validation records, and use that checkpoint to score all 40 test records. |
