@@ -1,19 +1,22 @@
 # Data and model assets
 
-This repository contains **source code**. The public assets are distributed as four
-Zenodo records; files created by a local run are listed separately at the end.
+This repository contains **source code**. The assets are described in four Zenodo
+records. The checkpoint/encoder record requires prior access approval; datasets and
+caches are publicly available. Files created by a local run are listed separately at the end.
 
-## Public download records
+## Asset records
 
 | Resource | Record | Notes |
 |---|---|---|
 | Benchmark splits | https://doi.org/10.5281/zenodo.23534656 | mixed, strict, holdout FASTA |
-| Seed-42 checkpoint + NT-V3 encoder | https://doi.org/10.5281/zenodo.23535423 | checkpoint 90.2 MB; encoder archive 28.6 MB |
+| Seed-42 checkpoint + NT-V3 encoder | https://doi.org/10.5281/zenodo.23535423 | access approval required; checkpoint 90.2 MB; encoder archive 28.6 MB |
 | Shared training views + protein cache | https://doi.org/10.5281/zenodo.23537662 | view cache 60.0 MB; protein cache 32 volumes, 979 MB extracted |
 | Toy subset | https://doi.org/10.5281/zenodo.23538085 | 960/240/40 demo with its own caches |
 
-Only the **seed-42** checkpoint is public. Seeds 43–51 are not part of the public
-weight record. The training-view cache is shared: it was generated once with seed 42
+Access to the **seed-42** checkpoint and encoder archive requires prior authorization
+from the authors. Request access through the linked Zenodo record before downloading.
+Seeds 43–51 are not part of this weight record.
+The training-view cache is shared: it was generated once with seed 42
 and reused for every training seed.
 
 Extract `data/` and `cache/` into `toy/`. The [toy guide](toy/README.md) gives the platform-specific commands and toy training settings.
@@ -51,7 +54,8 @@ containing it) and the shared cache under `runs/shared/`.
 | `runs/full_seed<ID>/seed<ID>/best_nucleotide_v3_mamba_model.pth` | `run_full_training.sh`; a local training output, not a release hash |
 | `out_eval/` | `run_eval.sh` predictions and metrics |
 
-`assets_manifest.json` separates these local outputs from the public assets.
+`assets_manifest.json` lists these local outputs separately from the restricted weights
+and public assets.
 
 ## Training and evaluation
 

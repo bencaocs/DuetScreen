@@ -55,7 +55,7 @@ contrastive projection.
 | Goal | Entry | What it needs |
 |---|---|---|
 | See the workflow run quickly | **Quick toy demo** → [`toy/README.md`](toy/README.md), archive https://doi.org/10.5281/zenodo.23538085 | Train on 960 records, select a checkpoint on 240 validation records, and test on 40 records. Includes its own caches. Extract the archive's `data/` and `cache/` directories. |
-| Score sequences with the published model | **Predict with the released checkpoint** → [prediction guide](#predict-with-the-released-checkpoint), record https://doi.org/10.5281/zenodo.23535423 | Seed-42 checkpoint, `NTv3_8M_pre`, and a protein cache; **no training required**. |
+| Score sequences with the published model | **Predict with the released checkpoint** → [prediction guide](#predict-with-the-released-checkpoint), record https://doi.org/10.5281/zenodo.23535423 | Seed-42 checkpoint and `NTv3_8M_pre` (**access approval required**), and a protein cache; **no training required**. |
 | Retrain with the released configuration | **Full training** → [training guide](#full-training-download--train--metrics), record https://doi.org/10.5281/zenodo.23537662 | Dataset, NT-V3 encoder, shared view cache and protein cache; GPU; hours. |
 
 All three paths share the environment described in **Environment**. Run commands from
@@ -119,19 +119,19 @@ cd DuetScreen
 
 | Download | From | Put it at |
 |---|---|---|
-| `NTv3_8M_pre.zip` | https://doi.org/10.5281/zenodo.23535423 | unzip into `assets/` → `assets/NTv3_8M_pre/` |
+| `NTv3_8M_pre.zip` | https://doi.org/10.5281/zenodo.23535423 (access approval required) | unzip into `assets/` → `assets/NTv3_8M_pre/` |
 | `mixed pool.zip` | https://doi.org/10.5281/zenodo.23534656 | unzip into `data/mixed/` → `train.fasta`, `val.fasta`, `test.fasta` |
 | `variants_data_seed42.pkl` | https://doi.org/10.5281/zenodo.23537662 | rename to `runs/shared/variants_data.pkl` |
 | `protein_seg_cache_35m.7z.001–032` | https://doi.org/10.5281/zenodo.23537662 | extract → `assets/protein_seg_cache_35m.pkl` |
-| `best_nucleotide_v3_mamba_model.pth` (optional) | https://doi.org/10.5281/zenodo.23535423 | `assets/checkpoints/seed42/best_nucleotide_v3_mamba_model.pth` |
+| `best_nucleotide_v3_mamba_model.pth` (optional) | https://doi.org/10.5281/zenodo.23535423 (access approval required) | `assets/checkpoints/seed42/best_nucleotide_v3_mamba_model.pth` |
 | `DuetScreen_ToySubset.zip` (optional toy) | https://doi.org/10.5281/zenodo.23538085 | Extract only `data/` and `cache/` into `toy/`; follow [the toy installation guide](toy/README.md#install-the-resources). |
 
 ```bash
 mkdir -p assets data/mixed runs/shared assets/checkpoints/seed42
 
-# nucleotide encoder
-wget -O /tmp/NTv3_8M_pre.zip "https://zenodo.org/records/23535423/files/NTv3_8M_pre.zip?download=1"
-unzip -o /tmp/NTv3_8M_pre.zip -d assets/
+# nucleotide encoder: after access approval, download NTv3_8M_pre.zip
+# from the linked Zenodo record into the current directory
+unzip -o NTv3_8M_pre.zip -d assets/
 
 # benchmark split
 wget -O /tmp/mixed_pool.zip "https://zenodo.org/records/23534656/files/mixed%20pool.zip?download=1"
@@ -349,9 +349,12 @@ Unpack `NTv3_8M_pre.zip` to `assets/NTv3_8M_pre` and pass the checkpoint to pred
 `--model`. Training writes its own checkpoint to `runs/full_seed<ID>/seed<ID>/`; the released
 seed-42 checkpoint can be used for prediction or as a starting point.
 
-**Only the seed-42 checkpoint is public.** The paper trained seeds 42–51; checkpoints 43–51 are not
-part of this weight record. The record licence is CC BY 4.0 for the author-created checkpoint; the
-NT-V3 weights retain their upstream terms (see `THIRD_PARTY.md`).
+**Access to the seed-42 checkpoint requires prior authorization from the authors.**
+Request access through the linked Zenodo record before downloading. The encoder archive
+in the same restricted record also requires approval. The paper trained seeds 42–51;
+checkpoints 43–51 are not part of this weight record. The record licence is CC BY 4.0
+for the author-created checkpoint; the NT-V3 weights retain their upstream terms
+(see `THIRD_PARTY.md`).
 
 ## Full training caches
 
@@ -561,9 +564,9 @@ one-step `--smoke` check; the full recipe expects the complete split.
 | ESM2-35M (`esm2_t12_35M_UR50D`) | frozen protein encoder | `facebook/esm2_t12_35M_UR50D` on Hugging Face |
 | trained checkpoint | needed for prediction; produced by the training recipe | your own run |
 
-`assets_manifest.json` separates the **public download assets** (checkpoint, encoder archive, view
-cache, protein cache, toy archive) from **local outputs** produced by training or evaluation, and
-records sizes and hashes for the public files.
+`assets_manifest.json` lists the **restricted weights** (checkpoint and encoder archive),
+**public download assets** (view cache, protein cache and toy archive), and **local outputs**
+produced by training or evaluation, with sizes and hashes for the archived files.
 
 ## Build the protein cache (ESM2-35M)
 
@@ -686,7 +689,8 @@ print("overlap", len(train & test))      # expected: 0
 
 ## Predict with the released checkpoint
 
-This entry scores sequences with the public seed-42 model **without retraining**. The released
+This entry scores sequences with the seed-42 model **without retraining**.
+**Checkpoint access requires prior authorization from the authors.** The released
 protein cache can be reused for inputs it covers; coverage of arbitrary new input sequences is not
 guaranteed.
 
@@ -694,8 +698,8 @@ guaranteed.
 
 | Resource | Source | Default placement |
 |---|---|---|
-| Seed-42 checkpoint | https://doi.org/10.5281/zenodo.23535423 | `assets/checkpoints/seed42/best_nucleotide_v3_mamba_model.pth` |
-| NT-V3 encoder | `NTv3_8M_pre.zip` in the same record | `assets/NTv3_8M_pre/` |
+| Seed-42 checkpoint | https://doi.org/10.5281/zenodo.23535423 (access approval required) | `assets/checkpoints/seed42/best_nucleotide_v3_mamba_model.pth` |
+| NT-V3 encoder | `NTv3_8M_pre.zip` in the same restricted record (access approval required) | `assets/NTv3_8M_pre/` |
 | Protein cache | https://doi.org/10.5281/zenodo.23537662 (extract the 32 volumes) | `assets/protein_seg_cache_35m.pkl` |
 | Input FASTA | your sequences | any path; examples below use `data/input.fasta` |
 | Docker image | built from this repository | `duetscreen-release:1.0` |
@@ -745,12 +749,12 @@ If PowerShell blocks scripts, start it with `powershell -ExecutionPolicy Bypass 
 ### Using a locally trained checkpoint (supplemental)
 
 Replace `MODEL` with `runs/full_seed<ID>/seed<ID>/best_nucleotide_v3_mamba_model.pth` in either
-command. Local checkpoints are training outputs, not the public seed-42 checkpoint; the same input
+command. Local checkpoints are training outputs, not the published seed-42 checkpoint; the same input
 and output rules apply.
 
 ### Seed selection
 
-The checkpoint path selects the seed; there is no automatic lookup. The public record contains seed
+The checkpoint path selects the seed; there is no automatic lookup. The checkpoint record contains seed
 42 only. The loader prints the seed stored inside the checkpoint, which is useful when several local
 runs exist.
 

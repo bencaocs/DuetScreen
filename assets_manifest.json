@@ -1,11 +1,12 @@
 {
- "schema_version": 2,
- "updated": "2026-11-08",
- "note": "Public release assets and local outputs are listed separately. Sizes and SHA-256 values were computed from the local copies used to prepare the release; Zenodo MD5 values are quoted where the upstream record publishes them.",
- "public_assets": [
+ "schema_version": 3,
+ "updated": "2026-11-11",
+ "note": "Restricted weights, public assets and local outputs are listed separately. Access to the checkpoint and encoder archive requires prior authorization from the authors. Sizes and SHA-256 values were computed from the local copies used to prepare the release; Zenodo MD5 values are quoted where the upstream record publishes them.",
+ "restricted_assets": [
   {
    "name": "DuetScreen seed-42 checkpoint",
    "record": "https://doi.org/10.5281/zenodo.23535423",
+   "access": "authorization_required",
    "file": "best_nucleotide_v3_mamba_model.pth",
    "path_when_placed": "assets/checkpoints/seed42/best_nucleotide_v3_mamba_model.pth",
    "role": "seed-42 trained classifier + downstream weights; prediction/evaluation entry",
@@ -15,13 +16,16 @@
   {
    "name": "NT-V3-Pre-8M encoder archive",
    "record": "https://doi.org/10.5281/zenodo.23535423",
+   "access": "authorization_required",
    "file": "NTv3_8M_pre.zip",
    "path_when_placed": "assets/NTv3_8M_pre/",
    "role": "frozen nucleotide encoder; extracted from the archive",
    "upstream": "https://huggingface.co/InstaDeepAI/NTv3_8M_pre",
    "size_bytes": 28644230,
    "sha256": "84073f27c12140b84bb5c2bcf298f753185dedb96b5eb9d5738e7f1a98b8b0b0"
-  },
+  }
+ ],
+ "public_assets": [
   {
    "name": "Shared training-view cache (seed-42 generation)",
    "record": "https://doi.org/10.5281/zenodo.23537662",

@@ -1,6 +1,6 @@
 # Toy training and test
 
-Train DuetScreen in Docker and use the checkpoint selected during this run to score 40 labelled records. The [toy archive](https://doi.org/10.5281/zenodo.23538085) includes the toy training views and protein features. Download the [NT-V3 pretrained encoder](https://doi.org/10.5281/zenodo.23535423) separately and extract it under `assets/NTv3_8M_pre/` so that `model.safetensors` is directly in that folder. Build the image from the current repository with `docker build -t duetscreen-release:1.0 .`. The runner uses a CUDA-enabled GPU.
+Train DuetScreen in Docker and use the checkpoint selected during this run to score 40 labelled records. The [toy archive](https://doi.org/10.5281/zenodo.23538085) includes the toy training views and protein features. After receiving access approval from the authors, download the [NT-V3 pretrained encoder](https://doi.org/10.5281/zenodo.23535423) separately and extract it under `assets/NTv3_8M_pre/` so that `model.safetensors` is directly in that folder. Build the image from the current repository with `docker build -t duetscreen-release:1.0 .`. The runner uses a CUDA-enabled GPU.
 
 ## Install the resources
 
