@@ -865,3 +865,7 @@ Code is MIT (`LICENSE`). Author-created data, splits, caches and the seed-42 che
 4.0 as stated on their Zenodo records. Encoder weights and third-party dependencies retain their
 upstream terms; see `THIRD_PARTY.md`. The NT-V3 archive is distributed through the checkpoint record,
 not relicensed by this repository.
+
+## Model weights. 
+
+Trained checkpoints are not included in this repository. Access is available under a data use agreement; contact [bencaocs@gmail.com] with institutional affiliation and intended use.
